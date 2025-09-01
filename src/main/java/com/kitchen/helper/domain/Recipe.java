@@ -7,6 +7,8 @@ import lombok.*;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.springframework.data.repository.cdi.Eager;
+
 @Entity
 @Table(name = "recipe")
 @Getter
@@ -32,7 +34,7 @@ public class Recipe {
   private String notes;
 
   @Builder.Default
-  @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
   private Set<RecipeIngredient> ingredients = new LinkedHashSet<>();
 
   public void addItem(RecipeIngredient ri) { ri.setRecipe(this); ingredients.add(ri); }

@@ -33,7 +33,7 @@ public class RecipeIngredient {
   private Ingredient ingredient;
 
   @Column(precision = 10, scale = 2)
-  private BigDecimal qty;
+  private BigDecimal quantity;
 
   @Column(length = 16)
   private String unit;

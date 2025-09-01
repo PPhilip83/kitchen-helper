@@ -102,14 +102,14 @@ public class SeedData {
                           Recipe recipe,
                           Map<String, Ingredient> byName,
                           String ingredientName,
-                          double qty,
+                          double quantity,
                           String unit) {
     Ingredient ing = byName.get(ingredientName.toLowerCase(Locale.ROOT));
     if (ing == null) return;
     riRepo.save(RecipeIngredient.builder()
         .recipe(recipe)
         .ingredient(ing)
-        .qty(BigDecimal.valueOf(qty))
+        .quantity(BigDecimal.valueOf(quantity))
         .unit(unit)
         .build());
   }
