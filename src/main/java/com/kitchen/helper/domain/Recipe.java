@@ -34,8 +34,9 @@ public class Recipe {
   private String notes;
 
   @Builder.Default
-  @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   private Set<RecipeIngredient> ingredients = new LinkedHashSet<>();
+
 
   public void addItem(RecipeIngredient ri) { ri.setRecipe(this); ingredients.add(ri); }
   public void removeItem(RecipeIngredient ri) { ingredients.remove(ri); ri.setRecipe(null); }
