@@ -4,12 +4,15 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kitchen.helper.domain.Ingredient;
 import com.kitchen.helper.repository.IngredientRepository;
 import com.kitchen.helper.service.dto.IngredientDTO;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -33,18 +36,35 @@ public class IngredientService {
         }
     }
 
-    public IngredientDTO addIngredient(Ingredient ingredient) {
-        log.info("Adding new ingredient: {}", ingredient.getName());
-        try {
-            Ingredient newIngredient = new Ingredient();
-            newIngredient.setName(ingredient.getName());
-            newIngredient.setHave(ingredient.isHave());
-
-            Ingredient saved = ingredientRepository.save(newIngredient);
-            return new IngredientDTO(saved);
-        } catch (Exception e) {
-            log.error("Failed to add ingredient {}", ingredient.getName(), e);
-            throw new RuntimeException("Unable to add ingredient at this time", e);
-        }
+    public IngredientDTO addIngredient(String name, boolean have) {
+    log.info("Adding new ingredient: {}", name);
+    ingredientRepository.findByNameIgnoreCase(name).ifPresent(i -> {
+        throw new IllegalStateException("Ingredient already exists: " + name);
+    });
+    Ingredient saved = ingredientRepository.save(
+        Ingredient.builder().name(name).have(have).build()
+    );
+    return new IngredientDTO(saved);
     }
+
+    public List<IngredientDTO> findAll(String query) {
+        List<Ingredient> list = (query == null || query.isBlank())
+            ? ingredientRepository.findAll(Sort.by(Sort.Order.asc("name").ignoreCase()))
+            : ingredientRepository.findByNameContainingIgnoreCaseOrderByNameAsc(query.trim());
+        return list.stream().map(IngredientDTO::new).toList();
+    }
+
+    @Transactional
+    public IngredientDTO updateHave(Long id, boolean have) {
+        Ingredient i = ingredientRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Ingredient not found: " + id));
+        i.setHave(have);
+        return new IngredientDTO(i);
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        ingredientRepository.deleteById(id);
+    }
+
 }
