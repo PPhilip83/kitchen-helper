@@ -14,4 +14,7 @@ public interface RecipeIngredientRepository extends JpaRepository<RecipeIngredie
 
     boolean existsByRecipePkIdAndIngredientPkId(Long recipePkId, Long ingredientPkId);
 
+    @Query("select i.name, ri.quantity, ri.unit from RecipeIngredient ri join ri.ingredient i where ri.recipe.pkId = :id order by i.name")
+    List<Object[]> findRowsForDetail(Long id);
+
 }

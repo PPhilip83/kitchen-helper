@@ -4,12 +4,14 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kitchen.helper.service.RecipeService;
 import com.kitchen.helper.service.dto.RecipeDTO;
+import com.kitchen.helper.service.dto.RecipeDetailDTO;
 import com.kitchen.helper.service.dto.RecipeSuggestionDTO;
 
 import lombok.RequiredArgsConstructor;
@@ -38,6 +40,11 @@ public class RecipeController {
         @RequestParam(defaultValue = "0") long maxMissing) {
     var list = recipeService.findSuggestions(maxMissing);
     return list.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(list);
+    }
+
+      @GetMapping("/{id}")
+    public ResponseEntity<RecipeDetailDTO> getOne(@PathVariable Long id) {
+        return ResponseEntity.ok(recipeService.getDetail(id));
     }
 
 }

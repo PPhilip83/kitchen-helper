@@ -7,8 +7,6 @@ import lombok.*;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.springframework.data.repository.cdi.Eager;
-
 @Entity
 @Table(name = "recipe")
 @Getter

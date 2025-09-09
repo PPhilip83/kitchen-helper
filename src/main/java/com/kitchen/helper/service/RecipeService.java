@@ -3,11 +3,15 @@ package com.kitchen.helper.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kitchen.helper.repository.RecipeIngredientRepository;
 import com.kitchen.helper.repository.RecipeRepository;
 import com.kitchen.helper.service.dto.RecipeDTO;
+import com.kitchen.helper.service.dto.RecipeDetailDTO;
 import com.kitchen.helper.service.dto.RecipeSuggestionDTO;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +51,31 @@ public class RecipeService {
                 .missingIngredientNames(missingNames)
                 .build();
         }).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public RecipeDetailDTO getDetail(Long id) {
+    var recipe = recipeRepository.findByPkId(id)
+    .orElseThrow(() -> new ResponseStatusException(
+        HttpStatus.NOT_FOUND, "Recipe not found: " + id));
+
+    var rows = recipeIngredientRepository.findRowsForDetail(id);
+    var ing = rows.stream().map(row -> {
+        String name = (String) row[0];
+        Number qty = (Number) row[1];
+        String unit = (String) row[2];
+        String amount = qty == null ? (unit == null ? "" : unit)
+            : (unit == null || unit.isBlank() ? String.valueOf(qty) : (qty + " " + unit));
+        return new RecipeDetailDTO.IngredientRow(name, amount.isBlank() ? null : amount);
+        }).toList();
+
+    return RecipeDetailDTO.builder()
+        .pkId(recipe.getPkId())
+        .name(recipe.getName())
+        .instructions(recipe.getInstructions())
+        .notes(recipe.getNotes())
+        .ingredients(ing)
+        .build();
     }
 
 }
