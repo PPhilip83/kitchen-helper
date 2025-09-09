@@ -12,4 +12,6 @@ public interface RecipeIngredientRepository extends JpaRepository<RecipeIngredie
     @Query("select i.name from RecipeIngredient ri join ri.ingredient i where ri.recipe.pkId = :recipeId and i.have = false order by i.name")
     List<String> findMissingNames(Long recipeId);
 
+    boolean existsByRecipePkIdAndIngredientPkId(Long recipePkId, Long ingredientPkId);
+
 }
